@@ -3,13 +3,10 @@ package adapters;
 import external.FirebasePush;
 import model.Notification;
 
-/**
- * PATRÓN ADAPTER
- * Adapta el objeto Notification a la interfaz de FirebasePush
- */
+
 public class PushAdapter implements NotificationSender {
     
-    private FirebasePush firebaseService;
+    private final FirebasePush firebaseService;
     
     public PushAdapter() {
         this.firebaseService = new FirebasePush();
@@ -40,7 +37,7 @@ public class PushAdapter implements NotificationSender {
             throw new IllegalArgumentException("El contenido no puede estar vacío");
         }
         
-        // ADAPTACIÓN: Convertir Notification a los parámetros de FirebasePush
+
         try {
             firebaseService.pushNotification(
                 deviceToken,           // deviceToken

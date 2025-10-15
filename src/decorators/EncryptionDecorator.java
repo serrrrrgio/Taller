@@ -4,9 +4,6 @@ import adapters.NotificationSender;
 import model.Notification;
 import java.util.Base64;
 
-// PATRÓN DECORATOR: Simula la encriptación del contenido del mensaje.
-// POR QUÉ: Permite añadir una capa de "seguridad" a cualquier notificación. El cliente puede decidir
-// en tiempo de ejecución si una notificación debe ser encriptada o no.
 public class EncryptionDecorator extends NotificationDecorator {
 
     public EncryptionDecorator(NotificationSender wrappedSender) {

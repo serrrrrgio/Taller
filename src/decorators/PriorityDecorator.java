@@ -4,9 +4,6 @@ import adapters.NotificationSender;
 import model.Notification;
 import model.Priority;
 
-// PATRÓN DECORATOR: Añade una etiqueta de prioridad al mensaje.
-// POR QUÉ: Permite marcar notificaciones como importantes dinámicamente. Se puede aplicar a cualquier
-// `NotificationSender` y se compone fácilmente con otros decoradores.
 public class PriorityDecorator extends NotificationDecorator {
     private final Priority priority;
 

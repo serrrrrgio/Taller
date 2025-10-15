@@ -9,7 +9,7 @@ import model.Notification;
  */
 public class SMSAdapter implements NotificationSender {
     
-    private TwilioSMS twilioService;
+    private final TwilioSMS twilioService;
     
     public SMSAdapter() {
         this.twilioService = new TwilioSMS();
@@ -46,7 +46,7 @@ public class SMSAdapter implements NotificationSender {
             System.out.println("SMS largo: se enviará como múltiples mensajes");
         }
         
-        // ADAPTACIÓN: Convertir Notification a los parámetros de TwilioSMS
+
         try {
             twilioService.sendTextMessage(phoneNumber, content);
             System.out.println("[SMSAdapter] ✓ Notificación adaptada y enviada");

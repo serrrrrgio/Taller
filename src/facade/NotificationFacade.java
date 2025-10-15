@@ -12,25 +12,6 @@ import model.Notification;
 import model.NotificationType;
 import model.Priority;
 
-/**
- * PATRÓN FACADE
- *
- * ¿QUÉ PROBLEMA RESUELVE?
- * Sin el facade, el usuario debe:
- * 1. Saber qué adapter crear según el tipo de notificación
- * 2. Saber cómo apilar los decoradores en el orden correcto
- * 3. Recordar crear cada decorador con sus parámetros
- * 4. Manejar toda la complejidad del sistema
- *
- * CON EL FACADE:
- * El usuario solo llama a métodos simples y el facade se encarga
- * de toda la complejidad internamente.
- *
- * ANALOGÍA:
- * Como la recepción de un hotel: tú solo dices "necesito una habitación"
- * y la recepción se encarga de verificar disponibilidad, asignar habitación,
- * crear llaves, registrar check-in, etc.
- */
 public class NotificationFacade {
 
     private int notificationCount;

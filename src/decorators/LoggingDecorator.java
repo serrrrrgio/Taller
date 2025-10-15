@@ -5,9 +5,7 @@ import model.Notification;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-// PATRÓN DECORATOR: Registra en consola cada notificación enviada.
-// POR QUÉ: Permite añadir logging de forma transversal sin que el notificador original
-// o el cliente lo sepan. Es útil para auditoría o depuración.
+
 public class LoggingDecorator extends NotificationDecorator {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 

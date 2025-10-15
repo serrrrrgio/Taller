@@ -3,13 +3,10 @@ package adapters;
 import external.GmailService;
 import model.Notification;
 
-/**
- * PATRÓN ADAPTER
- * Adapta el objeto Notification a la interfaz de GmailService
- */
+
 public class EmailAdapter implements NotificationSender {
     
-    private GmailService gmailService;
+    private final GmailService gmailService;
     
     public EmailAdapter() {
         this.gmailService = new GmailService();
@@ -40,7 +37,7 @@ public class EmailAdapter implements NotificationSender {
             throw new IllegalArgumentException("El contenido no puede estar vacío");
         }
         
-        // ADAPTACIÓN: Convertir Notification a los parámetros de GmailService
+
         try {
             gmailService.sendGmailMessage(
                 email,              // to
