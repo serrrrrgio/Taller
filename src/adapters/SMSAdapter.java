@@ -3,18 +3,56 @@ package adapters;
 import external.TwilioSMS;
 import model.Notification;
 
-// PATRÓN ADAPTER: Adapta el objeto `Notification` a la interfaz de `TwilioSMS`.
-// POR QUÉ: Permite que el sistema use el servicio de Twilio a través de la interfaz común `send`,
-// sin necesidad de conocer los detalles de `sendTextMessage`.
+/**
+ * PATRÓN ADAPTER
+ * Adapta el objeto Notification a la interfaz de TwilioSMS
+ */
 public class SMSAdapter implements NotificationSender {
-    private final TwilioSMS twilioSMS = new TwilioSMS();
-
+    
+    private TwilioSMS twilioService;
+    
+    public SMSAdapter() {
+        this.twilioService = new TwilioSMS();
+    }
+    
+    public SMSAdapter(TwilioSMS twilioService) {
+        this.twilioService = twilioService;
+    }
+    
     @Override
     public void send(Notification notification) {
-        if (notification.getRecipient() == null || notification.getRecipient().trim().isEmpty()) {
-            System.out.println("SMS-ERROR: Invalid recipient for SMS.");
-            return;
+        // Validaciones
+        if (notification == null) {
+            throw new IllegalArgumentException("La notificación no puede ser nula");
         }
-        twilioSMS.sendTextMessage(notification.getRecipient(), notification.getContent());
+        
+        String phoneNumber = notification.getRecipient();
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            throw new IllegalArgumentException("El número de teléfono no puede estar vacío");
+        }
+        
+        if (!twilioService.validatePhoneNumber(phoneNumber)) {
+            throw new IllegalArgumentException(
+                "Número inválido. Formato esperado: +573001234567"
+            );
+        }
+        
+        String content = notification.getContent();
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("El contenido no puede estar vacío");
+        }
+        
+        if (content.length() > 160) {
+            System.out.println("SMS largo: se enviará como múltiples mensajes");
+        }
+        
+        // ADAPTACIÓN: Convertir Notification a los parámetros de TwilioSMS
+        try {
+            twilioService.sendTextMessage(phoneNumber, content);
+            System.out.println("[SMSAdapter] ✓ Notificación adaptada y enviada");
+        } catch (Exception e) {
+            System.err.println("[SMSAdapter] ✗ Error: " + e.getMessage());
+            throw new RuntimeException("Error al enviar SMS", e);
+        }
     }
 }

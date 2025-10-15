@@ -3,24 +3,54 @@ package adapters;
 import external.FirebasePush;
 import model.Notification;
 
-// PATRÓN ADAPTER: Adapta el objeto `Notification` a la interfaz de `FirebasePush`.
-// POR QUÉ: Unifica la forma de enviar notificaciones push bajo el método `send(notification)`,
-// ocultando la firma específica de `pushNotification`.
+/**
+ * PATRÓN ADAPTER
+ * Adapta el objeto Notification a la interfaz de FirebasePush
+ */
 public class PushAdapter implements NotificationSender {
-    private final FirebasePush firebasePush = new FirebasePush();
-
+    
+    private FirebasePush firebaseService;
+    
+    public PushAdapter() {
+        this.firebaseService = new FirebasePush();
+    }
+    
+    public PushAdapter(FirebasePush firebaseService) {
+        this.firebaseService = firebaseService;
+    }
+    
     @Override
     public void send(Notification notification) {
-        if (notification.getRecipient() == null || notification.getRecipient().trim().isEmpty()) {
-            System.out.println("PUSH-ERROR: Invalid recipient for Push Notification.");
-            return;
+        // Validaciones
+        if (notification == null) {
+            throw new IllegalArgumentException("La notificación no puede ser nula");
         }
-
-        // Asumimos un formato "título;mensaje" para el contenido
-        String[] parts = notification.getContent().split(";", 2);
-        String title = parts.length > 1 ? parts[0] : "Notification";
-        String message = parts.length > 1 ? parts[1] : notification.getContent();
-
-        firebasePush.pushNotification(notification.getRecipient(), title, message);
+        
+        String deviceToken = notification.getRecipient();
+        if (deviceToken == null || deviceToken.trim().isEmpty()) {
+            throw new IllegalArgumentException("El device token no puede estar vacío");
+        }
+        
+        if (deviceToken.length() < 20) {
+            throw new IllegalArgumentException("Device token inválido (muy corto)");
+        }
+        
+        String content = notification.getContent();
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("El contenido no puede estar vacío");
+        }
+        
+        // ADAPTACIÓN: Convertir Notification a los parámetros de FirebasePush
+        try {
+            firebaseService.pushNotification(
+                deviceToken,           // deviceToken
+                "Nueva Notificación",  // title
+                content                // message
+            );
+            System.out.println("[PushAdapter] ✓ Notificación adaptada y enviada");
+        } catch (Exception e) {
+            System.err.println("[PushAdapter] ✗ Error: " + e.getMessage());
+            throw new RuntimeException("Error al enviar push notification", e);
+        }
     }
 }

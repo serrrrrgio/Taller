@@ -1,6 +1,7 @@
 import adapters.EmailAdapter;
 import adapters.NotificationSender;
 import adapters.SMSAdapter;
+import adapters.PushAdapter;
 import decorators.EncryptionDecorator;
 import decorators.LoggingDecorator;
 import decorators.PriorityDecorator;
@@ -11,69 +12,112 @@ import model.NotificationType;
 import model.Priority;
 
 public class Main {
+
     public static void main(String[] args) {
+
         System.out.println("=============================================");
-        System.out.println("DEMOSTRACIÓN USANDO EL PATRÓN FACADE");
+        System.out.println("  DEMOSTRACION CON FACADE");
         System.out.println("=============================================\n");
 
         NotificationFacade facade = new NotificationFacade();
 
-        // 1. Enviar email simple
-        System.out.println("--- 1. Enviando Email Simple ---");
-        Notification simpleEmail = new Notification("usuario@ejemplo.com", "Tarea simple;Esta es una tarea simple.", NotificationType.EMAIL);
+        // Caso 1: Email simple
+        System.out.println("--- CASO 1: Email Simple ---");
+        Notification simpleEmail = new Notification(
+                "usuario@ejemplo.com",
+                "Tienes una nueva tarea pendiente",
+                NotificationType.EMAIL
+        );
         facade.sendSimpleNotification(simpleEmail);
 
-        // 2. Enviar SMS con prioridad alta y timestamp
-        System.out.println("--- 2. Enviando SMS con Prioridad Alta y Timestamp ---");
-        Notification prioritySms = new Notification("123456789", "¡Reunión importante en 5 minutos!", NotificationType.SMS);
-        facade.sendFullNotification(prioritySms, false, true, Priority.HIGH);
+        // Caso 2: SMS con prioridad
+        System.out.println("\n--- CASO 2: SMS con Prioridad Alta ---");
+        Notification prioritySms = new Notification(
+                "+573001234567",
+                "Reunion de emergencia en 5 minutos",
+                NotificationType.SMS
+        );
+        facade.sendPriorityNotification(prioritySms, Priority.HIGH);
 
-        // 3. Enviar notificación push encriptada
-        System.out.println("--- 3. Enviando Notificación Push Encriptada ---");
-        Notification securePush = new Notification("device-token-123", "Datos de acceso;usuario:contraseña", NotificationType.PUSH);
+        // Caso 3: Email con timestamp
+        System.out.println("\n--- CASO 3: Email con Timestamp ---");
+        Notification timestampEmail = new Notification(
+                "gerente@empresa.com",
+                "Reporte diario procesado",
+                NotificationType.EMAIL
+        );
+        facade.sendTimestampedNotification(timestampEmail);
+
+        // Caso 4: Push encriptado
+        System.out.println("\n--- CASO 4: Push Encriptado ---");
+        Notification securePush = new Notification(
+                "device-token-abc123def456ghi789jkl012mno345pqr678stu901vwx234yz",
+                "Codigo de verificacion: 847362",
+                NotificationType.PUSH
+        );
         facade.sendSecureNotification(securePush);
 
-        // 4. Enviar notificación completa (Email con todo)
-        System.out.println("--- 4. Enviando Notificación Completa (Email) ---");
-        Notification fullEmail = new Notification(
-            "admin@ejemplo.com",
-            "Reporte Final;Este es el reporte de fin de mes.",
-            NotificationType.EMAIL
+        // Caso 5: Notificacion completa
+        System.out.println("\n--- CASO 5: Notificacion Completa ---");
+        Notification fullNotification = new Notification(
+                "ceo@empresa.com",
+                "Reporte Trimestral Q4",
+                NotificationType.EMAIL
         );
-        facade.sendFullNotification(fullEmail, true, true, Priority.HIGH);
+        facade.sendFullNotification(fullNotification, true, true, Priority.HIGH);
 
-        // 5. Mostrar estadísticas
-        System.out.println("--- 5. Estadísticas ---");
-        System.out.println("Total de notificaciones enviadas a través de la fachada: " + facade.getNotificationCount());
-        System.out.println(facade);
+        // Caso 6: Diferentes prioridades
+        System.out.println("\n--- CASO 6: Diferentes Prioridades ---");
+        Notification lowPriority = new Notification(
+                "+573009876543",
+                "Mantenimiento programado",
+                NotificationType.SMS
+        );
+        Notification mediumPriority = new Notification(
+                "+573009876543",
+                "Actualizacion disponible",
+                NotificationType.SMS
+        );
+        Notification highPriority = new Notification(
+                "+573009876543",
+                "Contrasena cambiada",
+                NotificationType.SMS
+        );
+
+        facade.sendPriorityNotification(lowPriority, Priority.LOW);
+        facade.sendPriorityNotification(mediumPriority, Priority.MEDIUM);
+        facade.sendPriorityNotification(highPriority, Priority.HIGH);
+
+        // Estadisticas
+        System.out.println("\n--- ESTADISTICAS ---");
+        facade.printStatistics();
 
 
-        System.out.println("\n\n=============================================");
-        System.out.println("DEMO SIN FACADE (USO DIRECTO DE COMPONENTES)");
-        System.out.println("=============================================");
-        System.out.println("POR QUÉ: Este ejemplo muestra la complejidad que el Facade oculta.");
-        System.out.println("El cliente necesita conocer y ensamblar manualmente cada componente (Adapter y Decorators).\n");
+        // USO SIN FACADE
+        System.out.println("\n=============================================");
+        System.out.println("  DEMOSTRACION SIN FACADE");
+        System.out.println("=============================================\n");
 
-        // Mismo caso que el punto 2, pero de forma manual
-        System.out.println("--- Recreando el caso 2 (SMS con Prioridad y Timestamp) manualmente ---");
+        System.out.println("--- Construccion Manual de Decoradores ---");
 
-        // El cliente debe construir la cadena de responsabilidad manualmente:
-        // 1. Crear el notificador base (Adapter)
-        NotificationSender manualSmsSender = new SMSAdapter();
-        // 2. Envolverlo con el decorador de prioridad
-        manualSmsSender = new PriorityDecorator(manualSmsSender, Priority.HIGH);
-        // 3. Envolverlo con el decorador de timestamp
-        manualSmsSender = new TimestampDecorator(manualSmsSender);
-        // 4. Envolverlo con el decorador de logging (que la fachada aplica implícitamente)
-        manualSmsSender = new LoggingDecorator(manualSmsSender);
+        Notification manualNotification = new Notification(
+                "usuario@manual.com",
+                "Mensaje enviado manualmente",
+                NotificationType.EMAIL
+        );
 
-        // 5. Crear el objeto de notificación y enviarlo
-        Notification manualSms = new Notification("987654321", "¡Reunión importante en 5 minutos! (manual)", NotificationType.SMS);
-        manualSmsSender.send(manualSms);
+        NotificationSender manualSender = new EmailAdapter();
+        manualSender = new EncryptionDecorator(manualSender);
+        manualSender = new TimestampDecorator(manualSender);
+        manualSender = new PriorityDecorator(manualSender, Priority.HIGH);
+        manualSender = new LoggingDecorator(manualSender);
 
-        System.out.println("\nLíneas de código para enviar la notificación:");
-        System.out.println("- Con Facade: 2 (crear Notification, llamar a facade.sendFullNotification)");
-        System.out.println("- Manualmente: 5 (crear Notification, instanciar y anidar 3 decoradores y 1 adapter, llamar a send)");
-        System.out.println("El Facade es claramente más simple, reduce el código duplicado y desacopla al cliente del subsistema de notificaciones.");
+        manualSender.send(manualNotification);
+
+
+        // Comparacion
+        System.out.println("\n\n--- COMPARACION ---\n");
+        System.out.println("Con Facade: 3 lineas de codigo");
+        System.out.println("Sin Facade: 7 lineas de codigo");
     }
 }
